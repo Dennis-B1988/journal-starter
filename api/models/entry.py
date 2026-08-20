@@ -1,7 +1,17 @@
 from datetime import UTC, datetime
+from typing import Annotated
 from uuid import uuid4
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, StringConstraints
+
+JournalText = Annotated[
+    str,
+    StringConstraints(
+        strip_whitespace=True,
+        min_length=1,
+        max_length=256,
+    ),
+]
 
 
 class AnalysisResponse(BaseModel):
@@ -29,32 +39,33 @@ class EntryCreate(BaseModel):
     See https://docs.pydantic.dev/latest/concepts/types/#constrained-types
     """
 
-    work: str = Field(
-        max_length=256,
+    work: JournalText = Field(
         description="What did you work on today?",
         json_schema_extra={"example": "Studied FastAPI and built my first API endpoints"},
     )
-    struggle: str = Field(
-        max_length=256,
+    struggle: JournalText = Field(
         description="What's one thing you struggled with today?",
         json_schema_extra={"example": "Understanding async/await syntax and when to use it"},
     )
-    intention: str = Field(
-        max_length=256,
+    intention: JournalText = Field(
         description="What will you study/work on tomorrow?",
         json_schema_extra={"example": "Practice PostgreSQL queries and database design"},
     )
 
 
-# TODO (Task 3): Define an ``EntryUpdate`` model for PATCH /entries/{entry_id}.
-#
-# Requirements:
-#   - All three fields (``work``, ``struggle``, ``intention``) must be optional.
-#   - Each field, when provided, must follow the same validation rules as
-#     ``EntryCreate`` (non-empty, whitespace-stripped, max 256 chars).
-#
-# Once defined, import ``EntryUpdate`` in ``api/routers/journal_router.py``
-# and use it as the type of the PATCH endpoint's request body.
+class EntryUpdate(BaseModel):
+    # TODO (Task 3): Define an ``EntryUpdate`` model for PATCH /entries/{entry_id}.
+    #
+    # Requirements:
+    #   - All three fields (``work``, ``struggle``, ``intention``) must be optional.
+    #   - Each field, when provided, must follow the same validation rules as
+    #     ``EntryCreate`` (non-empty, whitespace-stripped, max 256 chars).
+    #
+    # Once defined, import ``EntryUpdate`` in ``api/routers/journal_router.py``
+    # and use it as the type of the PATCH endpoint's request body.
+    work: JournalText | None = None
+    struggle: JournalText | None = None
+    intention: JournalText | None = None
 
 
 class Entry(BaseModel):
