@@ -60,3 +60,4 @@ pythonVersion = "3.14"
 include = ["api", "scripts", "tests"]
 venvPath = "."
 venv = ".venv"
+extraPaths = ["./api/models"]
