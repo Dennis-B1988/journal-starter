@@ -11,6 +11,7 @@ Settings are loaded by ``api.config.Settings``.
 
 import json
 
+# import time
 import httpx
 from openai import AsyncOpenAI
 
@@ -42,51 +43,14 @@ async def analyze_journal_entry(
     entry_text: str,
     client: AsyncOpenAI | None = None,
 ) -> dict[str, object]:
-    """Analyze a journal entry using the OpenAI Responses API.
-
-    Args:
-        entry_id: ID of the entry being analyzed (pass through to the result).
-        entry_text: Combined work + struggle + intention text.
-        client: OpenAI client. If None, a default one is constructed from
-            application settings. Tests inject a client with a mocked transport;
-            the router calls this with no ``client`` argument. Caller-supplied
-            clients are left open for reuse.
-
-    Returns:
-        A dict validated by the Pydantic AnalysisResponse class:
-            {
-                "entry_id":  str,
-                "sentiment": str,   # "positive" | "negative" | "neutral"
-                "summary":   str,
-                "topics":    list[str],
-                "created_at": datetime,
-            }
-        AnalysisResponse generates created_at; the AI does not supply it.
-
-    TODO: Implement AI analysis (Chapter 9).
-      1. Define a JSON Schema for sentiment, summary, and topics.
-      2. Await client.responses.create() using get_settings().openai_model
-         and the full entry_text. Request structured JSON output.
-      3. Reject unfinished responses, refusals, and blank output_text with
-         InvalidAnalysisResponseError.
-      4. Parse output_text with json.loads() and require a dictionary.
-      5. Validate only the generated fields plus the supplied entry_id with
-         AnalysisResponse. Do not accept provider-generated IDs or timestamps.
-      6. Convert the validated model with model_dump(), set request_failed to
-         False, and return the dictionary. Let request and validation errors
-         propagate rather than returning fallback analysis.
-
-    Replace the NotImplementedError inside try with your implementation.
-    Client setup and cleanup are supplied; leave them unchanged. owns_client
-    tracks who created the client. request_failed preserves the original error
-    if cleanup also fails. See docs/09-ai-analysis.md for examples and checks.
-    """
+    """Analyze a journal entry using the OpenAI Responses API."""
     owns_client = client is None
     if client is None:
         client = _default_client()
 
     request_failed = True
     try:
+        # start = time.perf_counter()
         response = await client.responses.create(
             model=get_settings().openai_model,
             instructions=(
@@ -152,6 +116,18 @@ async def analyze_journal_entry(
 
         result = validated.model_dump()
         request_failed = False
+
+        # latency = time.perf_counter() - start
+        # print(get_settings().openai_model)
+        # print(f"Latency: {latency:.3f}s")
+
+        # if response.usage is not None:
+        #     print(f"Input tokens: {response.usage.input_tokens}")
+        #     print(f"Output tokens: {response.usage.output_tokens}")
+        #     print(f"Total tokens: {response.usage.total_tokens}")
+        # else:
+        #     print("Token usage: unavailable")
+
         return result
 
     finally:
