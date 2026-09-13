@@ -24,7 +24,8 @@ class Settings(BaseSettings):
         description=(
             "API key for a provider that supports the OpenAI Responses API. Task 4 uses it to "
             "construct an AsyncOpenAI client; during Tasks 1-3 any non-empty "
-            "placeholder works."
+            "placeholder works. For Bedrock, set it to 'iam' to authenticate with AWS IAM "
+            "credentials from the environment instead of a Bedrock API key."
         ),
     )
     openai_base_url: str = Field(
@@ -32,6 +33,36 @@ class Settings(BaseSettings):
     )
     openai_model: str = Field(
         description="Provider model ID or deployment name passed to responses.create().",
+    )
+    bedrock_guardrail_identifier: str | None = Field(
+        default=None,
+        description=(
+            "Optional Amazon Bedrock guardrail identifier applied via the "
+            "X-Amzn-Bedrock-GuardrailIdentifier request header."
+        ),
+    )
+    bedrock_guardrail_version: str | None = Field(
+        default=None,
+        description=(
+            "Optional Amazon Bedrock guardrail version (DRAFT or a numeric "
+            "version) applied via the X-Amzn-Bedrock-GuardrailVersion header."
+        ),
+    )
+    bedrock_guardrail_tag_suffix: str | None = Field(
+        default=None,
+        description=(
+            "Optional tag suffix appended to the guardrail identifier in the "
+            "X-Amzn-Bedrock-GuardrailSuffixedId header, formatted as "
+            "'<identifier>:<suffix>'."
+        ),
+    )
+    aws_region: str | None = Field(
+        default=None,
+        description=(
+            "AWS region for Bedrock IAM authentication. Defaults to the "
+            "AWS_REGION or AWS_DEFAULT_REGION environment variable, then "
+            "to 'us-east-1'."
+        ),
     )
 
     model_config = SettingsConfigDict(
