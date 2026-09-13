@@ -55,6 +55,7 @@ async def main() -> int:
         return 3
     except OpenAIError as exc:
         print(f"ERROR: provider request failed ({type(exc).__name__}).", file=sys.stderr)
+        print(get_settings().openai_model)
         return 3
     except (JSONDecodeError, InvalidAnalysisResponseError, ValidationError) as exc:
         print(f"ERROR: provider returned invalid analysis ({type(exc).__name__}).", file=sys.stderr)
