@@ -120,3 +120,4 @@ The actual cost depends on resource usage, particularly EC2, RDS, and Amazon Bed
 The main limitation before using this system in production is **the lack of user authentication and data isolation**.
 
 The Journal API currently does not distinguish between users or restrict access to individual users' journal entries. A production version would therefore need an authentication and authorization system, together with appropriate per-user data isolation, before handling real or sensitive journal content.
+
