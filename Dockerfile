@@ -2,6 +2,7 @@ FROM python:3.14-slim
 
 WORKDIR /app
 
+# Install uv
 RUN pip install --no-cache-dir uv
 
 COPY pyproject.toml uv.lock ./
