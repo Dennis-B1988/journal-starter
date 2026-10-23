@@ -172,3 +172,10 @@ cython_debug/
 
 # Docker
 docker-compose-yml
+
+# Kubernetes
+*secret.yaml
+
+# Terraform
+*.tfstate
+.terraform/

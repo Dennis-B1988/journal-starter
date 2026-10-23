@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: journal-db-init
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: postgres-init
+          image: postgres:15
+          command:
+            - /bin/sh
+            - -c
+            - |
+              psql "$DATABASE_URL" \
+                -v ON_ERROR_STOP=1 \
+                -f /sql/database_setup.sql
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: journal-secret
+                  key: DATABASE_URL
+          volumeMounts:
+            - name: sql
+              mountPath: /sql
+              readOnly: true
+      volumes:
+        - name: sql
+          configMap:
+            name: journal-db-init
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: journal-secret
+type: Opaque
+data:
+  DATABASE_URL: <BASE64_ENCODED_DATABASE_URL>
