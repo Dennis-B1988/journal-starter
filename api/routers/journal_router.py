@@ -19,9 +19,18 @@ from api.models.entry import (
 from api.repositories.interface_repository import DatabaseInterface
 from api.services.entry_service import EntryService
 from api.services.llm_service import InvalidAnalysisResponseError, analyze_journal_entry
+from api.telemetry import tracer
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+
+# service_name = os.getenv("OTEL_SERVICE_NAME", "journal-api")
+# resource = Resource.create(attributes={"service.name": service_name})
+
+# provider = TracerProvider(resource=resource)
+# processor = BatchSpanProcessor(ConsoleSpanExporter())
+# trace.set_tracer_provider(provider)
+# tracer = trace.get_tracer("journal_api_tracer", "1.0.0")
 
 
 async def get_database(request: Request) -> DatabaseInterface:
@@ -72,10 +81,13 @@ async def get_all_entries(entry_service: EntryServiceDependency) -> EntryListRes
 @router.get("/entries/{entry_id}")
 async def get_entry(entry_id: str, entry_service: EntryServiceDependency) -> Entry:
     """Get a journal entry by ID."""
-    entry = await entry_service.get_entry(entry_id)
-    if entry is None:
-        raise HTTPException(status_code=404, detail="Entry not found")
-    return entry
+    with tracer.start_as_current_span("get_entry") as span:
+        entry = await entry_service.get_entry(entry_id)
+        if entry is None:
+            raise HTTPException(status_code=404, detail="Entry not found")
+        span.set_attribute("entry_id", entry_id)
+
+        return entry
 
 
 @router.patch("/entries/{entry_id}")

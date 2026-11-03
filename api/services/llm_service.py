@@ -1,23 +1,3 @@
-"""Chapter 9: Implement journal analysis using the OpenAI Responses API.
-
-This project mandates the OpenAI Python SDK and a provider that supports the
-Responses API, such as:
-  - Amazon Bedrock (OpenAI-compatible endpoint)
-  - Microsoft Foundry Models
-  - OpenAI proper
-
-Amazon Bedrock supports two authentication modes, selected via OPENAI_API_KEY:
-  - API key: set OPENAI_API_KEY to a Bedrock API key string.
-  - IAM: set OPENAI_API_KEY=iam and provide AWS credentials through the
-    standard credential chain (environment variables such as
-    AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY, an ~/.aws/credentials profile,
-    SSO, or an attached IAM role). Requests are then signed with SigV4 by an
-    httpx transport built from boto3.
-
-Set OPENAI_API_KEY, OPENAI_BASE_URL, and OPENAI_MODEL in your .env file.
-Settings are loaded by ``api.config.Settings``.
-"""
-
 import json
 
 # import time
