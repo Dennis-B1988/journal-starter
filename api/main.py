@@ -3,6 +3,7 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 from api.config import get_settings
 from api.logging_config import configure_logging
@@ -32,3 +33,5 @@ app = FastAPI(
     lifespan=lifespan,
 )
 app.include_router(journal_router)
+
+FastAPIInstrumentor.instrument_app(app)
